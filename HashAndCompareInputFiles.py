@@ -1,6 +1,8 @@
 import hashlib
 import json
 import os
+import queue
+import threading
 
 
 def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None):
@@ -22,7 +24,7 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None):
         return
 
     # Hash Inputs
-    def HashInput(Input):
+    def HashInput(Input, ResultQueue):
         AbsoluteInputPath = os.path.abspath(Input)
         AbsoluteInputDirectory = os.path.dirname(AbsoluteInputPath)
         RelativeInputPath = os.path.basename(AbsoluteInputPath)
@@ -46,16 +48,24 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None):
         # Hash Files in File Paths
         for File in [AbsoluteInputDirectory + "/" + RelativeFile for RelativeFile in FilePaths]:
             with open(File, "rb") as OpenedFile:
-                HashObject.update(OpenedFile.read())
+                while OpenedFileChunk := OpenedFile.read(1024):
+                    HashObject.update(OpenedFileChunk)
 
         # Hash File Paths
         HashObject.update(bytes(json.dumps(FilePaths), "utf-8"))
 
-        # Return Digest of Hash
-        return HashObject.digest()
+        # Put Hash Digest in Result Queue
+        ResultQueue.put(HashObject.digest())
 
-    # TODO:  Threading
-    InputOneDigest = HashInput(InputOne)
-    InputTwoDigest = HashInput(InputTwo)
+    # Check Inputs in Threads
+    ResultQueue = queue.Queue()
+    InputOneThread = threading.Thread(target=HashInput, args=[InputOne, ResultQueue])
+    InputOneThread.start()
+    InputTwoThread = threading.Thread(target=HashInput, args=[InputTwo, ResultQueue])
+    InputTwoThread.start()
+    InputOneThread.join()
+    InputTwoThread.join()
+    DigestOne = ResultQueue.get()
+    DigestTwo = ResultQueue.get()
 
-    return InputOneDigest == InputTwoDigest
+    return DigestOne == DigestTwo
