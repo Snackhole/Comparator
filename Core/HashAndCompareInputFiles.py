@@ -30,7 +30,7 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None):
             Algorithm = DefaultAlgorithm
         else:
             print("No default algorithm is present.")
-            return
+            return None
     if Algorithm not in AvailableAlgorithms:
         print("Algorithm not available.")
         return None
