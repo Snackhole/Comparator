@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy
 
 
 class MainWindow(QMainWindow):
@@ -28,33 +28,50 @@ class MainWindow(QMainWindow):
         # self.setWindowIcon(self.WindowIcon)
         self.setWindowTitle(self.ScriptName)
 
+        # Button and Line Edit Size Policy
+        self.ButtonAndLineEditSizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+
         # Create Central Frame
         self.Frame = QFrame()
 
         # Create Widgets
-        self.InputOneLineEdit = QLineEdit()
-        self.InputOneLineEdit.setReadOnly(True)
-        self.InputOneLineEdit.setPlaceholderText("First File")
+        self.FileOneLineEdit = QLineEdit()
+        self.FileOneLineEdit.setReadOnly(True)
+        self.FileOneLineEdit.setPlaceholderText("First file to compare...")
+        self.FileOneLineEdit.setMinimumWidth(250)
+        self.FileOneLineEdit.setSizePolicy(self.ButtonAndLineEditSizePolicy)
 
-        self.InputTwoLineEdit = QLineEdit()
-        self.InputTwoLineEdit.setReadOnly(True)
-        self.InputTwoLineEdit.setPlaceholderText("Second File")
+        self.FileTwoLineEdit = QLineEdit()
+        self.FileTwoLineEdit.setReadOnly(True)
+        self.FileTwoLineEdit.setPlaceholderText("Second file to compare...")
+        self.FileTwoLineEdit.setMinimumWidth(250)
+        self.FileTwoLineEdit.setSizePolicy(self.ButtonAndLineEditSizePolicy)
 
-        self.InputOneSelectButton = QPushButton("Select")
-        self.InputTwoSelectButton = QPushButton("Select")
+        self.FileOneSelectButton = QPushButton("Select")
+        self.FileOneSelectButton.clicked.connect(lambda: self.SelectFile(self.FileOneLineEdit))
+        self.FileOneSelectButton.setSizePolicy(self.ButtonAndLineEditSizePolicy)
+        self.FileTwoSelectButton = QPushButton("Select")
+        self.FileTwoSelectButton.clicked.connect(lambda: self.SelectFile(self.FileTwoLineEdit))
+        self.FileTwoSelectButton.setSizePolicy(self.ButtonAndLineEditSizePolicy)
 
         self.HashAndCompareButton = QPushButton("Hash and Compare")
+        self.HashAndCompareButton.clicked.connect(self.HashAndCompare)
+        self.HashAndCompareButton.setSizePolicy(self.ButtonAndLineEditSizePolicy)
 
         # Create Layout
         self.Layout = QGridLayout()
-        self.Frame.setLayout(self.Layout)
 
         # Widgets in Layout
-        self.Layout.addWidget(self.InputOneLineEdit, 0, 0)
-        self.Layout.addWidget(self.InputOneSelectButton, 0, 1)
-        self.Layout.addWidget(self.InputTwoLineEdit, 1, 0)
-        self.Layout.addWidget(self.InputTwoSelectButton, 1, 1)
+        self.Layout.addWidget(self.FileOneLineEdit, 0, 0)
+        self.Layout.addWidget(self.FileOneSelectButton, 0, 1)
+        self.Layout.addWidget(self.FileTwoLineEdit, 1, 0)
+        self.Layout.addWidget(self.FileTwoSelectButton, 1, 1)
         self.Layout.addWidget(self.HashAndCompareButton, 2, 0, 1, 2)
+
+        # Set and Configure Layout
+        self.Layout.setColumnStretch(0, 1)
+        self.Layout.setRowStretch(2, 1)
+        self.Frame.setLayout(self.Layout)
 
         # Create Status Bar
         self.StatusBar = self.statusBar()
@@ -66,6 +83,12 @@ class MainWindow(QMainWindow):
 
     def GetResourcePath(self, RelativeLocation):
         return self.AbsoluteDirectoryPath + "/" + RelativeLocation
+
+    def SelectFile(self, FileLineEdit):
+        pass
+
+    def HashAndCompare(self):
+        pass
 
     # Interface Methods
     def DisplayMessageBox(self, Message, Icon=QMessageBox.Information, Buttons=QMessageBox.Ok, Parent=None):
