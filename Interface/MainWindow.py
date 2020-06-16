@@ -1,5 +1,7 @@
+import hashlib
+
 from PyQt5.QtCore import QTimer, Qt
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox
 
 
 class MainWindow(QMainWindow):
@@ -41,6 +43,10 @@ class MainWindow(QMainWindow):
         self.FileModeRadioButton = QRadioButton("File Mode")
         self.FileModeRadioButton.toggled.connect(self.ClearInput)
 
+        self.AlgorithmComboBox = QComboBox()
+        self.AlgorithmComboBox.setEditable(False)
+        self.PopulateAlgorithmList()
+
         self.FileOneLineEdit = QLineEdit()
         self.FileOneLineEdit.setReadOnly(True)
         self.FileOneLineEdit.setPlaceholderText("First file to compare...")
@@ -70,6 +76,7 @@ class MainWindow(QMainWindow):
         # Widgets in Layout
         self.Layout.addWidget(self.FolderModeRadioButton, 0, 0, Qt.AlignRight)
         self.Layout.addWidget(self.FileModeRadioButton, 0, 1)
+        self.Layout.addWidget(self.AlgorithmComboBox, 0, 2)
         self.Layout.addWidget(self.FileOneLineEdit, 1, 0, 1, 2)
         self.Layout.addWidget(self.FileOneSelectButton, 1, 2)
         self.Layout.addWidget(self.FileTwoLineEdit, 2, 0, 1, 2)
@@ -96,6 +103,18 @@ class MainWindow(QMainWindow):
     def ClearInput(self):
         self.FileOneLineEdit.clear()
         self.FileTwoLineEdit.clear()
+
+    def PopulateAlgorithmList(self):
+        AvailableAlgorithms = sorted(hashlib.algorithms_available)
+        self.AlgorithmComboBox.addItems(AvailableAlgorithms)
+        DefaultAlgorithmOptions = ("md5", "sha1")
+        DefaultAlgorithm = None
+        for DefaultAlgorithmOption in DefaultAlgorithmOptions:
+            if DefaultAlgorithmOption in AvailableAlgorithms:
+                DefaultAlgorithm = DefaultAlgorithmOption
+                break
+        if DefaultAlgorithm is not None:
+            self.AlgorithmComboBox.setCurrentText(DefaultAlgorithm)
 
     def SelectFile(self, FileLineEdit):
         pass
