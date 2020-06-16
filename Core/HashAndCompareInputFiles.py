@@ -4,12 +4,15 @@ import os
 import queue
 import threading
 
+
 # Hashing Thread
 class HashingThread(threading.Thread):
     def __init__(self, target, args):
         super().__init__(target=target, args=args)
         self.Stop = False
 
+
+# Hash and Compare Function
 def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFileNames=False):
     # Validate Inputs
     if not (os.path.exists(InputOne) and os.path.exists(InputTwo)):
@@ -111,7 +114,13 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
     InputTwoThread.start()
     InputOneThread.join()
     InputTwoThread.join()
+    if ResultQueue.empty():
+        print("Neither hashing thread successfully finished.")
+        return None
     DigestOne = ResultQueue.get()
+    if ResultQueue.empty():
+        print("At least one hashing thread did not successfully finish.")
+        return None
     DigestTwo = ResultQueue.get()
 
     return DigestOne == DigestTwo
