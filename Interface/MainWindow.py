@@ -1,7 +1,7 @@
 import hashlib
 
 from PyQt5.QtCore import QTimer, Qt
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox, QFileDialog
 
 
 class MainWindow(QMainWindow):
@@ -117,7 +117,11 @@ class MainWindow(QMainWindow):
             self.AlgorithmComboBox.setCurrentText(DefaultAlgorithm)
 
     def SelectFile(self, FileLineEdit):
-        pass
+        if self.FolderModeRadioButton.isChecked():
+            Selected = QFileDialog.getExistingDirectory(caption="Select Folder")
+        else:
+            Selected = QFileDialog.getOpenFileName(caption="Select File")[0]
+        FileLineEdit.setText(Selected)
 
     def HashAndCompare(self):
         pass
