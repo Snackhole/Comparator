@@ -19,9 +19,18 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None):
 
     # Determine Algorithm
     AvailableAlgorithms = sorted(list(hashlib.algorithms_available))
-    DefaultAlgorithm = "sha256"
+    DefaultAlgorithm = None
+    DefaultAlgorithmOptions = ("md5", "sha1")
+    for DefaultAlgorithmOption in DefaultAlgorithmOptions:
+        if DefaultAlgorithmOption in AvailableAlgorithms:
+            DefaultAlgorithm = DefaultAlgorithmOption
+            break
     if Algorithm is None:
-        Algorithm = DefaultAlgorithm
+        if DefaultAlgorithm is not None:
+            Algorithm = DefaultAlgorithm
+        else:
+            print("No default algorithm is present.")
+            return
     if Algorithm not in AvailableAlgorithms:
         print("Algorithm not available.")
         return None
