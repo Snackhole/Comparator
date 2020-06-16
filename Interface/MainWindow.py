@@ -2,7 +2,7 @@ import hashlib
 import os
 
 from PyQt5.QtCore import QTimer, Qt
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox, QFileDialog
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox, QFileDialog, QCheckBox
 
 from Core.HashAndCompareInputFiles import HashAndCompareInputFiles
 
@@ -45,6 +45,8 @@ class MainWindow(QMainWindow):
         self.FolderModeRadioButton.toggled.connect(self.ClearInput)
         self.FileModeRadioButton = QRadioButton("File Mode")
         self.FileModeRadioButton.toggled.connect(self.ClearInput)
+        self.IgnoreNamesInFileModeCheckBox = QCheckBox("Ignore names in file mode?")
+        self.IgnoreNamesInFileModeCheckBox.setChecked(True)
 
         self.AlgorithmComboBox = QComboBox()
         self.AlgorithmComboBox.setEditable(False)
@@ -79,16 +81,18 @@ class MainWindow(QMainWindow):
         # Widgets in Layout
         self.Layout.addWidget(self.FolderModeRadioButton, 0, 0, Qt.AlignRight)
         self.Layout.addWidget(self.FileModeRadioButton, 0, 1)
-        self.Layout.addWidget(self.AlgorithmComboBox, 0, 2)
-        self.Layout.addWidget(self.FileOneLineEdit, 1, 0, 1, 2)
-        self.Layout.addWidget(self.FileOneSelectButton, 1, 2)
-        self.Layout.addWidget(self.FileTwoLineEdit, 2, 0, 1, 2)
-        self.Layout.addWidget(self.FileTwoSelectButton, 2, 2)
-        self.Layout.addWidget(self.HashAndCompareButton, 3, 0, 1, 3)
+        self.Layout.addWidget(self.IgnoreNamesInFileModeCheckBox, 0, 2)
+        self.Layout.addWidget(self.AlgorithmComboBox, 0, 3)
+        self.Layout.addWidget(self.FileOneLineEdit, 1, 0, 1, 3)
+        self.Layout.addWidget(self.FileOneSelectButton, 1, 3)
+        self.Layout.addWidget(self.FileTwoLineEdit, 2, 0, 1, 3)
+        self.Layout.addWidget(self.FileTwoSelectButton, 2, 3)
+        self.Layout.addWidget(self.HashAndCompareButton, 3, 0, 1, 4)
 
         # Set and Configure Layout
         self.Layout.setColumnStretch(0, 1)
         self.Layout.setColumnStretch(1, 1)
+        self.Layout.setColumnStretch(2, 1)
         self.Layout.setRowStretch(3, 1)
         self.Frame.setLayout(self.Layout)
 
@@ -145,8 +149,14 @@ class MainWindow(QMainWindow):
         # Set Status Bar
         self.StatusBar.showMessage("Comparison in progress...")
 
+        # Check Whether to Ignore File Names
+        if self.FileModeRadioButton.isChecked() and self.IgnoreNamesInFileModeCheckBox.isChecked():
+            IgnoreNames = True
+        else:
+            IgnoreNames = False
+
         # Hash
-        FilesIdentical = HashAndCompareInputFiles(FileOne, FileTwo, Algorithm=self.AlgorithmComboBox.currentText())
+        FilesIdentical = HashAndCompareInputFiles(FileOne, FileTwo, Algorithm=self.AlgorithmComboBox.currentText(), IgnoreSingleFileNames=IgnoreNames)
 
         # Clear Status Bar
         self.StatusBar.clearMessage()

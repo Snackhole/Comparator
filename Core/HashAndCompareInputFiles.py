@@ -5,13 +5,16 @@ import queue
 import threading
 
 
-def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None):
+def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFileNames=False):
     # Validate Inputs
     if not (os.path.exists(InputOne) and os.path.exists(InputTwo)):
         print("At least one input does not exist.")
         return None
     if not ((os.path.isdir(InputOne) and os.path.isdir(InputTwo)) or (os.path.isfile(InputOne) and os.path.isfile(InputTwo))):
         print("Inputs must both be files or both be directories.")
+        return None
+    if (os.path.isdir(InputOne) or os.path.isdir(InputTwo)) and IgnoreSingleFileNames:
+        print("File names can only be ignored when comparing single files.")
         return None
     if InputOne == InputTwo:
         print("Must select different inputs to compare.")
@@ -64,7 +67,8 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None):
                     HashObject.update(OpenedFileChunk)
 
         # Hash File Paths
-        HashObject.update(bytes(json.dumps(FilePaths), "utf-8"))
+        if not IgnoreSingleFileNames:
+            HashObject.update(bytes(json.dumps(FilePaths), "utf-8"))
 
         # Put Hash Digest in Result Queue
         ResultQueue.put(HashObject.digest())
