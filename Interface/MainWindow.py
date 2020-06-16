@@ -1,5 +1,5 @@
-from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy
+from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton
 
 
 class MainWindow(QMainWindow):
@@ -35,6 +35,12 @@ class MainWindow(QMainWindow):
         self.Frame = QFrame()
 
         # Create Widgets
+        self.FolderModeRadioButton = QRadioButton("Folder Mode")
+        self.FolderModeRadioButton.setChecked(True)
+        self.FolderModeRadioButton.toggled.connect(self.ClearInput)
+        self.FileModeRadioButton = QRadioButton("File Mode")
+        self.FileModeRadioButton.toggled.connect(self.ClearInput)
+
         self.FileOneLineEdit = QLineEdit()
         self.FileOneLineEdit.setReadOnly(True)
         self.FileOneLineEdit.setPlaceholderText("First file to compare...")
@@ -62,15 +68,18 @@ class MainWindow(QMainWindow):
         self.Layout = QGridLayout()
 
         # Widgets in Layout
-        self.Layout.addWidget(self.FileOneLineEdit, 0, 0)
-        self.Layout.addWidget(self.FileOneSelectButton, 0, 1)
-        self.Layout.addWidget(self.FileTwoLineEdit, 1, 0)
-        self.Layout.addWidget(self.FileTwoSelectButton, 1, 1)
-        self.Layout.addWidget(self.HashAndCompareButton, 2, 0, 1, 2)
+        self.Layout.addWidget(self.FolderModeRadioButton, 0, 0, Qt.AlignRight)
+        self.Layout.addWidget(self.FileModeRadioButton, 0, 1)
+        self.Layout.addWidget(self.FileOneLineEdit, 1, 0, 1, 2)
+        self.Layout.addWidget(self.FileOneSelectButton, 1, 2)
+        self.Layout.addWidget(self.FileTwoLineEdit, 2, 0, 1, 2)
+        self.Layout.addWidget(self.FileTwoSelectButton, 2, 2)
+        self.Layout.addWidget(self.HashAndCompareButton, 3, 0, 1, 3)
 
         # Set and Configure Layout
         self.Layout.setColumnStretch(0, 1)
-        self.Layout.setRowStretch(2, 1)
+        self.Layout.setColumnStretch(1, 1)
+        self.Layout.setRowStretch(3, 1)
         self.Frame.setLayout(self.Layout)
 
         # Create Status Bar
@@ -83,6 +92,10 @@ class MainWindow(QMainWindow):
 
     def GetResourcePath(self, RelativeLocation):
         return self.AbsoluteDirectoryPath + "/" + RelativeLocation
+
+    def ClearInput(self):
+        self.FileOneLineEdit.clear()
+        self.FileTwoLineEdit.clear()
 
     def SelectFile(self, FileLineEdit):
         pass
