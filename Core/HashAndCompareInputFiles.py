@@ -13,6 +13,9 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None):
     if not ((os.path.isdir(InputOne) and os.path.isdir(InputTwo)) or (os.path.isfile(InputOne) and os.path.isfile(InputTwo))):
         print("Inputs must both be files or both be directories.")
         return
+    if InputOne == InputTwo:
+        print("Both inputs are the same file.")
+        return
 
     # Determine Algorithm
     AvailableAlgorithms = sorted(list(hashlib.algorithms_available))
