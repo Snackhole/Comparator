@@ -9,13 +9,13 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None):
     # Validate Inputs
     if not os.path.exists(InputOne) and os.path.exists(InputTwo):
         print("At least one input does not exist.")
-        return
+        return None
     if not ((os.path.isdir(InputOne) and os.path.isdir(InputTwo)) or (os.path.isfile(InputOne) and os.path.isfile(InputTwo))):
         print("Inputs must both be files or both be directories.")
-        return
+        return None
     if InputOne == InputTwo:
         print("Both inputs are the same file.")
-        return
+        return None
 
     # Determine Algorithm
     AvailableAlgorithms = sorted(list(hashlib.algorithms_available))
@@ -24,7 +24,7 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None):
         Algorithm = DefaultAlgorithm
     if Algorithm not in AvailableAlgorithms:
         print("Algorithm not available.")
-        return
+        return None
 
     # Hash Inputs
     def HashInput(Input, ResultQueue):
