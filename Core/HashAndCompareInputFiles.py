@@ -7,14 +7,14 @@ import threading
 
 def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None):
     # Validate Inputs
-    if not os.path.exists(InputOne) and os.path.exists(InputTwo):
+    if not (os.path.exists(InputOne) and os.path.exists(InputTwo)):
         print("At least one input does not exist.")
         return None
     if not ((os.path.isdir(InputOne) and os.path.isdir(InputTwo)) or (os.path.isfile(InputOne) and os.path.isfile(InputTwo))):
         print("Inputs must both be files or both be directories.")
         return None
     if InputOne == InputTwo:
-        print("Both inputs are the same file.")
+        print("Must select different inputs to compare.")
         return None
 
     # Determine Algorithm
