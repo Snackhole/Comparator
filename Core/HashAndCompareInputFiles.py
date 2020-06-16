@@ -4,6 +4,11 @@ import os
 import queue
 import threading
 
+# Hashing Thread
+class HashingThread(threading.Thread):
+    def __init__(self, target, args):
+        super().__init__(target=target, args=args)
+        self.Stop = False
 
 def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFileNames=False):
     # Validate Inputs
@@ -38,14 +43,25 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
         print("Algorithm not available.")
         return None
 
-    # Hash Inputs
+    # Hash Input Function
     def HashInput(Input, ResultQueue):
+        # Set Up Thread Stop Flag
+        CurrentThread = threading.current_thread()
+        assert (isinstance(CurrentThread, HashingThread))
+
         AbsoluteInputPath = os.path.abspath(Input)
         AbsoluteInputDirectory = os.path.dirname(AbsoluteInputPath)
         RelativeInputPath = os.path.basename(AbsoluteInputPath)
         FilePaths = []
 
         def MapFilePaths(AbsoluteInputDirectory, RelativeInputPath, FilePaths):
+            # Check Thread Stop Flag
+            CurrentThread = threading.current_thread()
+            assert (isinstance(CurrentThread, HashingThread))
+            if CurrentThread.Stop:
+                return
+
+            # Map File Paths
             CurrentFile = AbsoluteInputDirectory + "/" + RelativeInputPath
             if os.path.isfile(CurrentFile):
                 FilePaths.append(RelativeInputPath)
@@ -55,6 +71,10 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
 
         MapFilePaths(AbsoluteInputDirectory, RelativeInputPath, FilePaths)
 
+        # Check Thread Stop Flag
+        if CurrentThread.Stop:
+            return
+
         FilePaths.sort()
 
         # Create Hash Object
@@ -62,8 +82,18 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
 
         # Hash Files in File Paths
         for File in [AbsoluteInputDirectory + "/" + RelativeFile for RelativeFile in FilePaths]:
+            # Check Thread Stop Flag
+            if CurrentThread.Stop:
+                return
+
+            # Open File
             with open(File, "rb") as OpenedFile:
                 while OpenedFileChunk := OpenedFile.read(1024):
+                    # Check Thread Stop Flag
+                    if CurrentThread.Stop:
+                        return
+
+                    # Update Hash
                     HashObject.update(OpenedFileChunk)
 
         # Hash File Paths
@@ -75,9 +105,9 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
 
     # Check Inputs in Threads
     ResultQueue = queue.Queue()
-    InputOneThread = threading.Thread(target=HashInput, args=[InputOne, ResultQueue])
+    InputOneThread = HashingThread(target=HashInput, args=[InputOne, ResultQueue])
     InputOneThread.start()
-    InputTwoThread = threading.Thread(target=HashInput, args=[InputTwo, ResultQueue])
+    InputTwoThread = HashingThread(target=HashInput, args=[InputTwo, ResultQueue])
     InputTwoThread.start()
     InputOneThread.join()
     InputTwoThread.join()

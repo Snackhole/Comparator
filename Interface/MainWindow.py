@@ -1,10 +1,12 @@
 import hashlib
 import os
+import threading
 
+from PyQt5 import QtGui
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox, QFileDialog, QCheckBox
 
-from Core.HashAndCompareInputFiles import HashAndCompareInputFiles
+from Core.HashAndCompareInputFiles import HashAndCompareInputFiles, HashingThread
 
 
 class MainWindow(QMainWindow):
@@ -12,6 +14,9 @@ class MainWindow(QMainWindow):
         # Store Parameters
         self.ScriptName = ScriptName
         self.AbsoluteDirectoryPath = AbsoluteDirectoryPath
+
+        # Variables
+        self.ComparisonInProgress = False
 
         # Initialize
         super().__init__()
@@ -146,17 +151,19 @@ class MainWindow(QMainWindow):
             self.DisplayMessageBox("Must select different files to compare.")
             return
 
-        # Set Status Bar
-        self.StatusBar.showMessage("Comparison in progress...")
-
         # Check Whether to Ignore File Names
         if self.FileModeRadioButton.isChecked() and self.IgnoreNamesInFileModeCheckBox.isChecked():
             IgnoreNames = True
         else:
             IgnoreNames = False
 
-        # Hash
+        # Set Status Bar
+        self.StatusBar.showMessage("Comparison in progress...")
+
+        # Hash and Compare
+        self.ComparisonInProgress = True
         FilesIdentical = HashAndCompareInputFiles(FileOne, FileTwo, Algorithm=self.AlgorithmComboBox.currentText(), IgnoreSingleFileNames=IgnoreNames)
+        self.ComparisonInProgress = False
 
         # Clear Status Bar
         self.StatusBar.clearMessage()
@@ -168,6 +175,14 @@ class MainWindow(QMainWindow):
             self.DisplayMessageBox("Files are identical!")
         else:
             self.DisplayMessageBox("Files are not identical!", Icon=QMessageBox.Warning)
+
+    def closeEvent(self, Event: QtGui.QCloseEvent) -> None:
+        if self.ComparisonInProgress:
+            if self.DisplayMessageBox("A comparison is in progress.  Exit anyway?", Icon=QMessageBox.Question, Buttons=(QMessageBox.Yes | QMessageBox.No)) == QMessageBox.No:
+                return
+        for RunningThread in [RunningThread for RunningThread in threading.enumerate() if isinstance(RunningThread, HashingThread)]:
+            RunningThread.Stop = True
+        super().closeEvent(Event)
 
     # Interface Methods
     def DisplayMessageBox(self, Message, Icon=QMessageBox.Information, Buttons=QMessageBox.Ok, Parent=None):
