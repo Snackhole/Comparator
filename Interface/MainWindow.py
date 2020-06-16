@@ -1,7 +1,10 @@
 import hashlib
+import os
 
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox, QFileDialog
+
+from Core.HashAndCompareInputFiles import HashAndCompareInputFiles
 
 
 class MainWindow(QMainWindow):
@@ -121,24 +124,50 @@ class MainWindow(QMainWindow):
             Selected = QFileDialog.getExistingDirectory(caption="Select Folder")
         else:
             Selected = QFileDialog.getOpenFileName(caption="Select File")[0]
-        FileLineEdit.setText(Selected)
+        if Selected != "":
+            FileLineEdit.setText(Selected)
 
     def HashAndCompare(self):
-        pass
+        FileOne = self.FileOneLineEdit.text()
+        FileTwo = self.FileTwoLineEdit.text()
+
+        # Validate Inputs
+        if FileOne == "" or FileTwo == "":
+            self.DisplayMessageBox("Two files must be selected to compare.")
+            return
+        if not (os.path.exists(FileOne) and os.path.exists(FileTwo)):
+            self.DisplayMessageBox("At least one file does not exist.", Icon=QMessageBox.Warning)
+            return
+        if FileOne == FileTwo:
+            self.DisplayMessageBox("Must select different files to compare.")
+            return
+
+        # Set Status Bar
+        self.StatusBar.showMessage("Comparison in progress...")
+
+        # Hash
+        FilesIdentical = HashAndCompareInputFiles(FileOne, FileTwo, Algorithm=self.AlgorithmComboBox.currentText())
+
+        # Clear Status Bar
+        self.StatusBar.clearMessage()
+
+        # Display Results
+        if FilesIdentical is None:
+            self.DisplayMessageBox("An error occurred.  Files were not compared.", Icon=QMessageBox.Warning)
+        elif FilesIdentical:
+            self.DisplayMessageBox("Files are identical!")
+        else:
+            self.DisplayMessageBox("Files are not identical!", Icon=QMessageBox.Warning)
 
     # Interface Methods
     def DisplayMessageBox(self, Message, Icon=QMessageBox.Information, Buttons=QMessageBox.Ok, Parent=None):
         MessageBox = QMessageBox(self if Parent is None else Parent)
-        MessageBox.setWindowIcon(self.WindowIcon)
+        # MessageBox.setWindowIcon(self.WindowIcon)
         MessageBox.setWindowTitle(self.ScriptName)
         MessageBox.setIcon(Icon)
         MessageBox.setText(Message)
         MessageBox.setStandardButtons(Buttons)
         return MessageBox.exec_()
-
-    def FlashStatusBar(self, Status, Duration=2000):
-        self.StatusBar.showMessage(Status)
-        QTimer.singleShot(Duration, self.StatusBar.clearMessage)
 
     # Window Management Methods
     def Center(self):
