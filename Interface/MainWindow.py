@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton
 
 
 class MainWindow(QMainWindow):
@@ -13,6 +13,11 @@ class MainWindow(QMainWindow):
 
         # Create Interface
         self.CreateInterface()
+
+        # Center Window
+        self.Center()
+
+        # Show Window
         self.show()
 
     def CreateInterface(self):
@@ -23,13 +28,39 @@ class MainWindow(QMainWindow):
         # self.setWindowIcon(self.WindowIcon)
         self.setWindowTitle(self.ScriptName)
 
-        # Widgets
+        # Create Central Frame
+        self.Frame = QFrame()
+
+        # Create Widgets
+        self.InputOneLineEdit = QLineEdit()
+        self.InputOneLineEdit.setReadOnly(True)
+        self.InputOneLineEdit.setPlaceholderText("First File")
+
+        self.InputTwoLineEdit = QLineEdit()
+        self.InputTwoLineEdit.setReadOnly(True)
+        self.InputTwoLineEdit.setPlaceholderText("Second File")
+
+        self.InputOneSelectButton = QPushButton("Select")
+        self.InputTwoSelectButton = QPushButton("Select")
+
+        self.HashAndCompareButton = QPushButton("Hash and Compare")
+
+        # Create Layout
+        self.Layout = QGridLayout()
+        self.Frame.setLayout(self.Layout)
+
+        # Widgets in Layout
+        self.Layout.addWidget(self.InputOneLineEdit, 0, 0)
+        self.Layout.addWidget(self.InputOneSelectButton, 0, 1)
+        self.Layout.addWidget(self.InputTwoLineEdit, 1, 0)
+        self.Layout.addWidget(self.InputTwoSelectButton, 1, 1)
+        self.Layout.addWidget(self.HashAndCompareButton, 2, 0, 1, 2)
 
         # Create Status Bar
         self.StatusBar = self.statusBar()
 
-        # Center Window
-        self.Center()
+        # Set Central Frame
+        self.setCentralWidget(self.Frame)
 
         # Initial Focus
 
