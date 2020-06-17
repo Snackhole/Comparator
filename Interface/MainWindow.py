@@ -2,6 +2,7 @@ import hashlib
 import os
 
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox, QFileDialog, QCheckBox
 
 from Core.HashAndCompareInputFiles import HashAndCompareInputFiles
@@ -30,10 +31,10 @@ class MainWindow(QMainWindow):
 
     def CreateInterface(self):
         # Create Window Icon
-        # self.WindowIcon = QIcon(self.GetResourcePath("Assets/SerpentHash Icon.png"))
+        self.WindowIcon = QIcon(self.GetResourcePath("Assets/SerpentHash Icon.png"))
 
         # Window Icon and Title
-        # self.setWindowIcon(self.WindowIcon)
+        self.setWindowIcon(self.WindowIcon)
         self.setWindowTitle(self.ScriptName)
 
         # Button and Line Edit Size Policy
@@ -183,7 +184,7 @@ class MainWindow(QMainWindow):
     # Interface Methods
     def DisplayMessageBox(self, Message, Icon=QMessageBox.Information, Buttons=QMessageBox.Ok, Parent=None):
         MessageBox = QMessageBox(self if Parent is None else Parent)
-        # MessageBox.setWindowIcon(self.WindowIcon)
+        MessageBox.setWindowIcon(self.WindowIcon)
         MessageBox.setWindowTitle(self.ScriptName)
         MessageBox.setIcon(Icon)
         MessageBox.setText(Message)
