@@ -75,9 +75,9 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
 
     # Check Inputs in Threads
     ResultQueue = queue.Queue()
-    InputOneThread = threading.Thread(target=HashInput, args=[InputOne, ResultQueue])
+    InputOneThread = threading.Thread(target=HashInput, args=[InputOne, ResultQueue], daemon=True)
     InputOneThread.start()
-    InputTwoThread = threading.Thread(target=HashInput, args=[InputTwo, ResultQueue])
+    InputTwoThread = threading.Thread(target=HashInput, args=[InputTwo, ResultQueue], daemon=True)
     InputTwoThread.start()
     InputOneThread.join()
     InputTwoThread.join()
