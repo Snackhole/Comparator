@@ -1,7 +1,7 @@
 import hashlib
 import os
 
-from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox, QFileDialog, QCheckBox
 
 from Core.HashAndCompareInputFiles import HashAndCompareInputFiles
@@ -12,6 +12,9 @@ class MainWindow(QMainWindow):
         # Store Parameters
         self.ScriptName = ScriptName
         self.AbsoluteDirectoryPath = AbsoluteDirectoryPath
+
+        # Variables
+        self.ComparisonInProgress = False
 
         # Initialize
         super().__init__()
@@ -156,7 +159,9 @@ class MainWindow(QMainWindow):
             IgnoreNames = False
 
         # Hash
+        self.ComparisonInProgress = True
         FilesIdentical = HashAndCompareInputFiles(FileOne, FileTwo, Algorithm=self.AlgorithmComboBox.currentText(), IgnoreSingleFileNames=IgnoreNames)
+        self.ComparisonInProgress = False
 
         # Clear Status Bar
         self.StatusBar.clearMessage()
@@ -168,6 +173,12 @@ class MainWindow(QMainWindow):
             self.DisplayMessageBox("Files are identical!")
         else:
             self.DisplayMessageBox("Files are not identical!", Icon=QMessageBox.Warning)
+
+    def closeEvent(self, Event):
+        if self.ComparisonInProgress:
+            if self.DisplayMessageBox("A comparison is in progress.  Exit anyway?", Icon=QMessageBox.Question, Buttons=(QMessageBox.Yes | QMessageBox.No)) == QMessageBox.No:
+                return
+        super().closeEvent(Event)
 
     # Interface Methods
     def DisplayMessageBox(self, Message, Icon=QMessageBox.Information, Buttons=QMessageBox.Ok, Parent=None):
