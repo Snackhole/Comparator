@@ -63,7 +63,7 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
         # Hash Files in File Paths
         for File in [AbsoluteInputDirectory + "/" + RelativeFile for RelativeFile in FilePaths]:
             with open(File, "rb") as OpenedFile:
-                while OpenedFileChunk := OpenedFile.read(1024):
+                while OpenedFileChunk := OpenedFile.read(65536):
                     HashObject.update(OpenedFileChunk)
 
         # Hash File Paths
