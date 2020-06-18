@@ -56,6 +56,10 @@ def Build():
     zipapp.create_archive(BuildVariables["BuildFolder"], BuildVariables["ExecutableZipName"], BuildVariables["Interpreter"], BuildVariables["Main"])
     print("Executable archive created.")
 
+    # Delete Build Folder
+    shutil.rmtree(BuildVariables["BuildFolder"])
+    print("Build folder deleted.")
+
     # Copy Assets to Build Folder and Move Executable Zip
     CopyFilesToBuildFolder(BuildVariables["AssetFiles"])
     print("Assets copied to build folder.")
