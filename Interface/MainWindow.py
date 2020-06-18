@@ -159,7 +159,6 @@ class MainWindow(QMainWindow):
 
         # Set Status Bar
         self.StatusBar.showMessage("Comparison in progress...")
-        self.StatusBar.repaint()
 
         # Check Whether to Ignore File Names
         if self.FileModeRadioButton.isChecked() and self.IgnoreNamesInFileModeCheckBox.isChecked():
