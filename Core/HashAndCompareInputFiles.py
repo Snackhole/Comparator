@@ -39,45 +39,51 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
         return None
 
     # Hash Inputs
-    def HashInput(Input, ResultQueue):
-        AbsoluteInputPath = os.path.abspath(Input)
-        AbsoluteInputDirectory = os.path.dirname(AbsoluteInputPath)
-        RelativeInputPath = os.path.basename(AbsoluteInputPath)
-        FilePaths = []
+    class HashThread(threading.Thread):
+        def __init__(self, Input, ResultQueue):
+            self.Input = Input
+            self.ResultQueue = ResultQueue
+            super().__init__(daemon=True)
 
-        def MapFilePaths(AbsoluteInputDirectory, RelativeInputPath, FilePaths):
-            CurrentFile = AbsoluteInputDirectory + "/" + RelativeInputPath
-            if os.path.isfile(CurrentFile):
-                FilePaths.append(RelativeInputPath)
-            elif os.path.isdir(CurrentFile):
-                for File in os.listdir(CurrentFile):
-                    MapFilePaths(AbsoluteInputDirectory, RelativeInputPath + "/" + File, FilePaths)
+        def run(self):
+            AbsoluteInputPath = os.path.abspath(self.Input)
+            AbsoluteInputDirectory = os.path.dirname(AbsoluteInputPath)
+            RelativeInputPath = os.path.basename(AbsoluteInputPath)
+            FilePaths = []
 
-        MapFilePaths(AbsoluteInputDirectory, RelativeInputPath, FilePaths)
+            def MapFilePaths(AbsoluteInputDirectory, RelativeInputPath, FilePaths):
+                CurrentFile = AbsoluteInputDirectory + "/" + RelativeInputPath
+                if os.path.isfile(CurrentFile):
+                    FilePaths.append(RelativeInputPath)
+                elif os.path.isdir(CurrentFile):
+                    for File in os.listdir(CurrentFile):
+                        MapFilePaths(AbsoluteInputDirectory, RelativeInputPath + "/" + File, FilePaths)
 
-        FilePaths.sort()
+            MapFilePaths(AbsoluteInputDirectory, RelativeInputPath, FilePaths)
 
-        # Create Hash Object
-        HashObject = hashlib.new(Algorithm)
+            FilePaths.sort()
 
-        # Hash Files in File Paths
-        for File in [AbsoluteInputDirectory + "/" + RelativeFile for RelativeFile in FilePaths]:
-            with open(File, "rb") as OpenedFile:
-                while OpenedFileChunk := OpenedFile.read(65536):
-                    HashObject.update(OpenedFileChunk)
+            # Create Hash Object
+            HashObject = hashlib.new(Algorithm)
 
-        # Hash File Paths
-        if not IgnoreSingleFileNames:
-            HashObject.update(bytes(json.dumps(FilePaths), "utf-8"))
+            # Hash Files in File Paths
+            for File in [AbsoluteInputDirectory + "/" + RelativeFile for RelativeFile in FilePaths]:
+                with open(File, "rb") as OpenedFile:
+                    while OpenedFileChunk := OpenedFile.read(65536):
+                        HashObject.update(OpenedFileChunk)
 
-        # Put Hash Digest in Result Queue
-        ResultQueue.put(HashObject.digest())
+            # Hash File Paths
+            if not IgnoreSingleFileNames:
+                HashObject.update(bytes(json.dumps(FilePaths), "utf-8"))
+
+            # Put Hash Digest in Result Queue
+            self.ResultQueue.put(HashObject.digest())
 
     # Check Inputs in Threads
     ResultQueue = queue.Queue()
-    InputOneThread = threading.Thread(target=HashInput, args=[InputOne, ResultQueue], daemon=True)
+    InputOneThread = HashThread(InputOne, ResultQueue)
     InputOneThread.start()
-    InputTwoThread = threading.Thread(target=HashInput, args=[InputTwo, ResultQueue], daemon=True)
+    InputTwoThread = HashThread(InputTwo, ResultQueue)
     InputTwoThread.start()
     InputOneThread.join()
     InputTwoThread.join()
