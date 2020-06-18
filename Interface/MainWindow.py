@@ -81,6 +81,18 @@ class MainWindow(QMainWindow):
         self.CompareHashesButton.clicked.connect(self.CompareHashes)
         self.CompareHashesButton.setSizePolicy(self.ButtonAndLineEditSizePolicy)
 
+        # Widgets to Disable While Comparing
+        self.DisableList = []
+        self.DisableList.append(self.FolderModeRadioButton)
+        self.DisableList.append(self.FileModeRadioButton)
+        self.DisableList.append(self.IgnoreNamesInFileModeCheckBox)
+        self.DisableList.append(self.AlgorithmComboBox)
+        self.DisableList.append(self.FileOneLineEdit)
+        self.DisableList.append(self.FileOneSelectButton)
+        self.DisableList.append(self.FileTwoLineEdit)
+        self.DisableList.append(self.FileTwoSelectButton)
+        self.DisableList.append(self.CompareHashesButton)
+
         # Create Layout
         self.Layout = QGridLayout()
 
@@ -157,9 +169,6 @@ class MainWindow(QMainWindow):
             self.DisplayMessageBox("Must select different files to compare.")
             return
 
-        # Set Status Bar
-        self.StatusBar.showMessage("Comparison in progress...")
-
         # Check Whether to Ignore File Names
         if self.FileModeRadioButton.isChecked() and self.IgnoreNamesInFileModeCheckBox.isChecked():
             IgnoreNames = True
@@ -167,15 +176,14 @@ class MainWindow(QMainWindow):
             IgnoreNames = False
 
         # Compare
-        self.ComparisonInProgress = True
+        self.SetComparisonInProgress(True)
         ComparisonThreadInst = ComparisonThread(FileOne, FileTwo, Algorithm=self.AlgorithmComboBox.currentText(), IgnoreSingleFileNames=IgnoreNames)
         ComparisonThreadInst.ComparisonDoneSignal.connect(lambda: self.DisplayResult(ComparisonThreadInst))
         ComparisonThreadInst.start()
 
     def DisplayResult(self, ComparisonThread):
         # Clear In-Progress
-        self.ComparisonInProgress = False
-        self.StatusBar.clearMessage()
+        self.SetComparisonInProgress(False)
 
         # Get Result
         FilesIdentical = ComparisonThread.Result
@@ -206,6 +214,15 @@ class MainWindow(QMainWindow):
         MessageBox.setText(Message)
         MessageBox.setStandardButtons(Buttons)
         return MessageBox.exec_()
+
+    def SetComparisonInProgress(self, ComparisonInProgress):
+        self.ComparisonInProgress = ComparisonInProgress
+        for Widget in self.DisableList:
+            Widget.setDisabled(ComparisonInProgress)
+        if ComparisonInProgress:
+            self.StatusBar.showMessage("Comparison in progress...")
+        else:
+            self.StatusBar.clearMessage()
 
     # Window Management Methods
     def Center(self):
