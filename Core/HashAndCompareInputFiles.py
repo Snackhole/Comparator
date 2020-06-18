@@ -101,7 +101,7 @@ class ComparisonThread(threading.Thread):
         self.Algorithm = Algorithm
         self.IgnoreSingleFileNames = IgnoreSingleFileNames
         self.Result = None
-        super().__init__()
+        super().__init__(daemon=True)
 
     def run(self) -> None:
         self.Result = HashAndCompareInputFiles(self.InputOne, self.InputTwo, Algorithm=self.Algorithm, IgnoreSingleFileNames=self.IgnoreSingleFileNames)
