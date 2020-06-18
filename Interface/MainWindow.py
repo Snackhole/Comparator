@@ -16,6 +16,7 @@ class MainWindow(QMainWindow):
 
         # Variables
         self.ComparisonInProgress = False
+        self.LastSelectedFilePath = None
 
         # Initialize
         super().__init__()
@@ -114,6 +115,7 @@ class MainWindow(QMainWindow):
     def ClearInput(self):
         self.FileOneLineEdit.clear()
         self.FileTwoLineEdit.clear()
+        self.LastSelectedFilePath = None
 
     def PopulateAlgorithmList(self):
         AvailableAlgorithms = sorted(hashlib.algorithms_available)
@@ -128,12 +130,18 @@ class MainWindow(QMainWindow):
             self.AlgorithmComboBox.setCurrentText(DefaultAlgorithm)
 
     def SelectFile(self, FileLineEdit):
+        CurrentPath = ""
+        if self.LastSelectedFilePath is not None:
+            LastSelectedFilePathDirectory = os.path.dirname(self.LastSelectedFilePath)
+            if os.path.exists(LastSelectedFilePathDirectory):
+                CurrentPath = LastSelectedFilePathDirectory
         if self.FolderModeRadioButton.isChecked():
-            Selected = QFileDialog.getExistingDirectory(caption="Select Folder")
+            Selected = QFileDialog.getExistingDirectory(caption="Select Folder", directory=CurrentPath)
         else:
-            Selected = QFileDialog.getOpenFileName(caption="Select File")[0]
+            Selected = QFileDialog.getOpenFileName(caption="Select File", directory=CurrentPath)[0]
         if Selected != "":
             FileLineEdit.setText(Selected)
+            self.LastSelectedFilePath = Selected
 
     def HashAndCompare(self):
         FileOne = self.FileOneLineEdit.text()
