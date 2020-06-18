@@ -51,7 +51,6 @@ class MainWindow(QMainWindow):
         self.FolderModeRadioButton.setChecked(True)
         self.FolderModeRadioButton.toggled.connect(self.ClearInput)
         self.FileModeRadioButton = QRadioButton("File Mode")
-        self.FileModeRadioButton.toggled.connect(self.ClearInput)
         self.IgnoreNamesInFileModeCheckBox = QCheckBox("Ignore names in file mode?")
         self.IgnoreNamesInFileModeCheckBox.setChecked(True)
 
@@ -108,8 +107,6 @@ class MainWindow(QMainWindow):
 
         # Set Central Frame
         self.setCentralWidget(self.Frame)
-
-        # Initial Focus
 
     def GetResourcePath(self, RelativeLocation):
         return self.AbsoluteDirectoryPath + "/" + RelativeLocation
