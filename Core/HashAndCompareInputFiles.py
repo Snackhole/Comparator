@@ -91,18 +91,3 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
     DigestTwo = ResultQueue.get()
 
     return DigestOne == DigestTwo
-
-
-class ComparisonThread(threading.Thread):
-    def __init__(self, MainWindow, InputOne, InputTwo, Algorithm=None, IgnoreSingleFileNames=False) -> None:
-        self.MainWindow = MainWindow
-        self.InputOne = InputOne
-        self.InputTwo = InputTwo
-        self.Algorithm = Algorithm
-        self.IgnoreSingleFileNames = IgnoreSingleFileNames
-        self.Result = None
-        super().__init__(daemon=True)
-
-    def run(self) -> None:
-        self.Result = HashAndCompareInputFiles(self.InputOne, self.InputTwo, Algorithm=self.Algorithm, IgnoreSingleFileNames=self.IgnoreSingleFileNames)
-        self.MainWindow.DisplayResult(self.Result)

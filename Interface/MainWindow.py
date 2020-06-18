@@ -1,6 +1,8 @@
 import hashlib
 import os
+import threading
 
+from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox, QFileDialog, QCheckBox
@@ -15,6 +17,7 @@ class MainWindow(QMainWindow):
         self.AbsoluteDirectoryPath = AbsoluteDirectoryPath
 
         # Variables
+        self.ComparisonInProgress = False
         self.LastSelectedFilePath = None
 
         # Initialize
@@ -166,19 +169,36 @@ class MainWindow(QMainWindow):
         else:
             IgnoreNames = False
 
-        # Hash
-        FilesIdentical = HashAndCompareInputFiles(FileOne, FileTwo, Algorithm=self.AlgorithmComboBox.currentText(), IgnoreSingleFileNames=IgnoreNames)
+        # Compare
+        self.ComparisonInProgress = True
+        ComparisonThreadInst = ComparisonThread(FileOne, FileTwo, Algorithm=self.AlgorithmComboBox.currentText(), IgnoreSingleFileNames=IgnoreNames)
+        ComparisonThreadInst.ComparisonDoneSignal.connect(lambda: self.DisplayResult(ComparisonThreadInst))
+        ComparisonThreadInst.start()
 
-        # Clear Status Bar
+    def DisplayResult(self, ComparisonThread):
+        # Clear In-Progress
+        self.ComparisonInProgress = False
         self.StatusBar.clearMessage()
 
-        # Display Results
+        # Get Result
+        FilesIdentical = ComparisonThread.Result
+
+        # Display Result
         if FilesIdentical is None:
             self.DisplayMessageBox("An error occurred.  Files were not compared.", Icon=QMessageBox.Warning)
         elif FilesIdentical:
             self.DisplayMessageBox("Files are identical!")
         else:
             self.DisplayMessageBox("Files are not identical!", Icon=QMessageBox.Warning)
+
+    def closeEvent(self, event):
+        if self.ComparisonInProgress:
+            if self.DisplayMessageBox("A comparison is in progress.  Exit anyway?", Icon=QMessageBox.Question, Buttons=(QMessageBox.Yes | QMessageBox.No)) == QMessageBox.Yes:
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.accept()
 
     # Interface Methods
     def DisplayMessageBox(self, Message, Icon=QMessageBox.Information, Buttons=QMessageBox.Ok, Parent=None):
@@ -196,3 +216,23 @@ class MainWindow(QMainWindow):
         DesktopCenterPoint = QApplication.primaryScreen().availableGeometry().center()
         FrameGeometryRectangle.moveCenter(DesktopCenterPoint)
         self.move(FrameGeometryRectangle.topLeft())
+
+
+class ComparisonThread(QtCore.QObject):
+    ComparisonDoneSignal = QtCore.pyqtSignal()
+
+    def __init__(self, InputOne, InputTwo, Algorithm=None, IgnoreSingleFileNames=False):
+        super().__init__()
+        self.InputOne = InputOne
+        self.InputTwo = InputTwo
+        self.Algorithm = Algorithm
+        self.IgnoreSingleFileNames = IgnoreSingleFileNames
+        self.Result = None
+        self.Thread = threading.Thread(target=self.run, daemon=True)
+
+    def start(self):
+        self.Thread.start()
+
+    def run(self):
+        self.Result = HashAndCompareInputFiles(self.InputOne, self.InputTwo, Algorithm=self.Algorithm, IgnoreSingleFileNames=self.IgnoreSingleFileNames)
+        self.ComparisonDoneSignal.emit()
