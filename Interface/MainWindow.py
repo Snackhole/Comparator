@@ -15,7 +15,6 @@ class MainWindow(QMainWindow):
         self.AbsoluteDirectoryPath = AbsoluteDirectoryPath
 
         # Variables
-        self.ComparisonInProgress = False
         self.LastSelectedFilePath = None
 
         # Initialize
@@ -76,9 +75,9 @@ class MainWindow(QMainWindow):
         self.FileTwoSelectButton.clicked.connect(lambda: self.SelectFile(self.FileTwoLineEdit))
         self.FileTwoSelectButton.setSizePolicy(self.ButtonAndLineEditSizePolicy)
 
-        self.HashAndCompareButton = QPushButton("Hash and Compare")
-        self.HashAndCompareButton.clicked.connect(self.HashAndCompare)
-        self.HashAndCompareButton.setSizePolicy(self.ButtonAndLineEditSizePolicy)
+        self.CompareHashesButton = QPushButton("Compare Hashes")
+        self.CompareHashesButton.clicked.connect(self.CompareHashes)
+        self.CompareHashesButton.setSizePolicy(self.ButtonAndLineEditSizePolicy)
 
         # Create Layout
         self.Layout = QGridLayout()
@@ -92,7 +91,7 @@ class MainWindow(QMainWindow):
         self.Layout.addWidget(self.FileOneSelectButton, 1, 3)
         self.Layout.addWidget(self.FileTwoLineEdit, 2, 0, 1, 3)
         self.Layout.addWidget(self.FileTwoSelectButton, 2, 3)
-        self.Layout.addWidget(self.HashAndCompareButton, 3, 0, 1, 4)
+        self.Layout.addWidget(self.CompareHashesButton, 3, 0, 1, 4)
 
         # Set and Configure Layout
         self.Layout.setColumnStretch(0, 1)
@@ -143,7 +142,7 @@ class MainWindow(QMainWindow):
             FileLineEdit.setText(Selected)
             self.LastSelectedFilePath = Selected
 
-    def HashAndCompare(self):
+    def CompareHashes(self):
         FileOne = self.FileOneLineEdit.text()
         FileTwo = self.FileTwoLineEdit.text()
 
@@ -160,6 +159,7 @@ class MainWindow(QMainWindow):
 
         # Set Status Bar
         self.StatusBar.showMessage("Comparison in progress...")
+        self.StatusBar.repaint()
 
         # Check Whether to Ignore File Names
         if self.FileModeRadioButton.isChecked() and self.IgnoreNamesInFileModeCheckBox.isChecked():
@@ -168,9 +168,7 @@ class MainWindow(QMainWindow):
             IgnoreNames = False
 
         # Hash
-        self.ComparisonInProgress = True
         FilesIdentical = HashAndCompareInputFiles(FileOne, FileTwo, Algorithm=self.AlgorithmComboBox.currentText(), IgnoreSingleFileNames=IgnoreNames)
-        self.ComparisonInProgress = False
 
         # Clear Status Bar
         self.StatusBar.clearMessage()
@@ -182,12 +180,6 @@ class MainWindow(QMainWindow):
             self.DisplayMessageBox("Files are identical!")
         else:
             self.DisplayMessageBox("Files are not identical!", Icon=QMessageBox.Warning)
-
-    def closeEvent(self, Event):
-        if self.ComparisonInProgress:
-            if self.DisplayMessageBox("A comparison is in progress.  Exit anyway?", Icon=QMessageBox.Question, Buttons=(QMessageBox.Yes | QMessageBox.No)) == QMessageBox.No:
-                return
-        super().closeEvent(Event)
 
     # Interface Methods
     def DisplayMessageBox(self, Message, Icon=QMessageBox.Information, Buttons=QMessageBox.Ok, Parent=None):
