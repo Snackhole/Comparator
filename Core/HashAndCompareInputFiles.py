@@ -6,7 +6,7 @@ import threading
 from math import ceil
 
 
-def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFileNames=False):
+def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFileNames=True):
     # Validate Inputs
     if not (os.path.exists(InputOne) and os.path.exists(InputTwo)):
         print("At least one input does not exist.")
@@ -60,10 +60,10 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
         if DefaultAlgorithm is not None:
             Algorithm = DefaultAlgorithm
         else:
-            print("No default algorithm is present.")
+            print("No default algorithm is present.  Available algorithms:\n\n" + str(AvailableAlgorithms))
             return None
     if Algorithm not in AvailableAlgorithms:
-        print("Algorithm not available.")
+        print("Algorithm not available.  Available algorithms:\n\n" + str(AvailableAlgorithms))
         return None
 
     # Hash Inputs
