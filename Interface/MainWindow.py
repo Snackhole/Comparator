@@ -4,7 +4,7 @@ import threading
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox, QFileDialog, QCheckBox
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox, QFileDialog, QCheckBox, QProgressBar, QLabel
 
 from Interface.Threads.ComparisonThread import ComparisonThread
 from Interface.Threads.StatusThread import StatusThread
@@ -81,6 +81,11 @@ class MainWindow(QMainWindow):
         self.CompareHashesButton.clicked.connect(self.CompareHashes)
         self.CompareHashesButton.setSizePolicy(self.ButtonAndLineEditSizePolicy)
 
+        self.FileOneProgressLabel = QLabel("File One Progress")
+        self.FileOneProgressBar = QProgressBar()
+        self.FileTwoProgressLabel = QLabel("File Two Progress")
+        self.FileTwoProgressBar = QProgressBar()
+
         # Widgets to Disable While Comparing
         self.DisableList = []
         self.DisableList.append(self.FolderModeRadioButton)
@@ -105,13 +110,19 @@ class MainWindow(QMainWindow):
         self.Layout.addWidget(self.FileOneSelectButton, 1, 3)
         self.Layout.addWidget(self.FileTwoLineEdit, 2, 0, 1, 3)
         self.Layout.addWidget(self.FileTwoSelectButton, 2, 3)
-        self.Layout.addWidget(self.CompareHashesButton, 3, 0, 1, 4)
+        self.ProgressLayout = QGridLayout()
+        self.ProgressLayout.addWidget(self.FileOneProgressLabel, 0, 0)
+        self.ProgressLayout.addWidget(self.FileOneProgressBar, 0, 1)
+        self.ProgressLayout.addWidget(self.FileTwoProgressLabel, 0, 2)
+        self.ProgressLayout.addWidget(self.FileTwoProgressBar, 0, 3)
+        self.Layout.addLayout(self.ProgressLayout, 3, 0, 1, 4)
+        self.Layout.addWidget(self.CompareHashesButton, 4, 0, 1, 4)
 
         # Set and Configure Layout
         self.Layout.setColumnStretch(0, 1)
         self.Layout.setColumnStretch(1, 1)
         self.Layout.setColumnStretch(2, 1)
-        self.Layout.setRowStretch(3, 1)
+        self.Layout.setRowStretch(4, 1)
         self.Frame.setLayout(self.Layout)
 
         # Create Status Bar
@@ -237,9 +248,16 @@ class MainWindow(QMainWindow):
             self.StatusBar.showMessage("Comparison in progress...")
         else:
             self.StatusBar.clearMessage()
+            self.FileOneProgressBar.reset()
+            self.FileTwoProgressBar.reset()
 
     def UpdateProgress(self, HashThreadOne, HashThreadTwo):
-        pass
+        if self.FileOneProgressBar.maximum() != HashThreadOne.InputSize:
+            self.FileOneProgressBar.setMaximum(HashThreadOne.InputSize)
+        if self.FileTwoProgressBar.maximum() != HashThreadTwo.InputSize:
+            self.FileTwoProgressBar.setMaximum(HashThreadTwo.InputSize)
+        self.FileOneProgressBar.setValue(HashThreadOne.HashedBytes)
+        self.FileTwoProgressBar.setValue(HashThreadTwo.HashedBytes)
 
     # Window Management Methods
     def Center(self):
