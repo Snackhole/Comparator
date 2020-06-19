@@ -1,9 +1,7 @@
 # SerpentHash
 SerpentHash is a small tool to generate hashes of two files or directories and compare them with each other, written in Python 3.8 with PyQT5.
 
-When comparing folders with each other, the folder names must be identical, including the root folder.
-
-When comparing single files with each other, file names can be optionally ignored.
+When comparing folders with each other, the folder names must be identical, including the root folder selected.  However, when comparing single files with each other, file names can be optionally ignored.
 
 The algorithm used defaults to md5, with SHA-1 as a fallback, but you can select any algorithm available to your Python 3 installation.
 
