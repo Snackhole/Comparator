@@ -2,12 +2,12 @@ import hashlib
 import os
 import threading
 
-from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox, QFileDialog, QCheckBox
 
-from Core.HashAndCompareInputFiles import HashAndCompareInputFiles
+from Interface.Threads.ComparisonThread import ComparisonThread
+from Interface.Threads.StatusThread import StatusThread
 
 
 class MainWindow(QMainWindow):
@@ -247,42 +247,3 @@ class MainWindow(QMainWindow):
         DesktopCenterPoint = QApplication.primaryScreen().availableGeometry().center()
         FrameGeometryRectangle.moveCenter(DesktopCenterPoint)
         self.move(FrameGeometryRectangle.topLeft())
-
-
-class ComparisonThread(QtCore.QObject):
-    ComparisonDoneSignal = QtCore.pyqtSignal()
-
-    def __init__(self, InputOne, InputTwo, Algorithm=None, IgnoreSingleFileNames=False):
-        super().__init__()
-        self.InputOne = InputOne
-        self.InputTwo = InputTwo
-        self.Algorithm = Algorithm
-        self.IgnoreSingleFileNames = IgnoreSingleFileNames
-        self.Result = None
-        self.Thread = threading.Thread(target=self.run, daemon=True)
-        self.ComparisonDone = False
-
-    def start(self):
-        self.Thread.start()
-
-    def run(self):
-        self.Result = HashAndCompareInputFiles(self.InputOne, self.InputTwo, Algorithm=self.Algorithm, IgnoreSingleFileNames=self.IgnoreSingleFileNames)
-        self.ComparisonDone = True
-        self.ComparisonDoneSignal.emit()
-
-
-class StatusThread(QtCore.QObject):
-    UpdateProgressSignal = QtCore.pyqtSignal()
-
-    def __init__(self, HashThreadOne, HashThreadTwo):
-        super().__init__()
-        self.HashThreadOne = HashThreadOne
-        self.HashThreadTwo = HashThreadTwo
-        self.Thread = threading.Thread(target=self.run, daemon=True)
-
-    def start(self):
-        self.Thread.start()
-
-    def run(self):
-        while not self.HashThreadOne.HashComplete and not self.HashThreadTwo.HashComplete:
-            self.UpdateProgressSignal.emit()
