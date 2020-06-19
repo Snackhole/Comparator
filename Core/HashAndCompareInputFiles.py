@@ -76,7 +76,7 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
 
             # Store Parameters
             self.Input = Input
-            self.InputSize = ceil(InputSize / self.ChunkSize)
+            self.InputSize = ceil(InputSize / self.ChunkSize) * self.ChunkSize
             self.ResultQueue = ResultQueue
 
             # Initialize
