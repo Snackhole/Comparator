@@ -181,6 +181,20 @@ class MainWindow(QMainWindow):
         ComparisonThreadInst.ComparisonDoneSignal.connect(lambda: self.DisplayResult(ComparisonThreadInst))
         ComparisonThreadInst.start()
 
+        # Set Up Status Checking
+        while threading.active_count() < 4 and not ComparisonThreadInst.ComparisonDone:
+            pass
+        try:
+            HashThreadOne = [RunningThread for RunningThread in threading.enumerate() if RunningThread.name == "HashThreadOne"][0]
+            HashThreadTwo = [RunningThread for RunningThread in threading.enumerate() if RunningThread.name == "HashThreadTwo"][0]
+        except IndexError:
+            HashThreadOne = None
+            HashThreadTwo = None
+        if HashThreadOne is not None and HashThreadTwo is not None:
+            StatusThreadInst = StatusThread(HashThreadOne, HashThreadTwo)
+            StatusThreadInst.UpdateProgressSignal.connect(lambda: self.UpdateProgress(HashThreadOne, HashThreadTwo))
+            StatusThreadInst.start()
+
     def DisplayResult(self, ComparisonThread):
         # Clear In-Progress
         self.SetComparisonInProgress(False)
@@ -224,6 +238,9 @@ class MainWindow(QMainWindow):
         else:
             self.StatusBar.clearMessage()
 
+    def UpdateProgress(self, HashThreadOne, HashThreadTwo):
+        pass
+
     # Window Management Methods
     def Center(self):
         FrameGeometryRectangle = self.frameGeometry()
@@ -243,10 +260,29 @@ class ComparisonThread(QtCore.QObject):
         self.IgnoreSingleFileNames = IgnoreSingleFileNames
         self.Result = None
         self.Thread = threading.Thread(target=self.run, daemon=True)
+        self.ComparisonDone = False
 
     def start(self):
         self.Thread.start()
 
     def run(self):
         self.Result = HashAndCompareInputFiles(self.InputOne, self.InputTwo, Algorithm=self.Algorithm, IgnoreSingleFileNames=self.IgnoreSingleFileNames)
+        self.ComparisonDone = True
         self.ComparisonDoneSignal.emit()
+
+
+class StatusThread(QtCore.QObject):
+    UpdateProgressSignal = QtCore.pyqtSignal()
+
+    def __init__(self, HashThreadOne, HashThreadTwo):
+        super().__init__()
+        self.HashThreadOne = HashThreadOne
+        self.HashThreadTwo = HashThreadTwo
+        self.Thread = threading.Thread(target=self.run, daemon=True)
+
+    def start(self):
+        self.Thread.start()
+
+    def run(self):
+        while not self.HashThreadOne.HashComplete and not self.HashThreadTwo.HashComplete:
+            self.UpdateProgressSignal.emit()
