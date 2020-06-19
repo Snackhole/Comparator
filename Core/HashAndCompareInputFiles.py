@@ -68,7 +68,7 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
 
     # Hash Inputs
     class HashThread(threading.Thread):
-        def __init__(self, Input, InputSize, ResultQueue):
+        def __init__(self, Name, Input, InputSize, ResultQueue):
             # Variables
             self.ChunkSize = 65536
             self.HashedBytes = 0
@@ -80,7 +80,7 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
             self.ResultQueue = ResultQueue
 
             # Initialize
-            super().__init__(daemon=True)
+            super().__init__(name=Name, daemon=True)
 
         def run(self):
             AbsoluteInputPath = os.path.abspath(self.Input)
@@ -122,9 +122,9 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
 
     # Check Inputs in Threads
     ResultQueue = queue.Queue()
-    InputOneThread = HashThread(InputOne, InputOneSize, ResultQueue)
+    InputOneThread = HashThread("HashThreadOne", InputOne, InputOneSize, ResultQueue)
     InputOneThread.start()
-    InputTwoThread = HashThread(InputTwo, InputTwoSize, ResultQueue)
+    InputTwoThread = HashThread("HashThreadTwo", InputTwo, InputTwoSize, ResultQueue)
     InputTwoThread.start()
     InputOneThread.join()
     InputTwoThread.join()
