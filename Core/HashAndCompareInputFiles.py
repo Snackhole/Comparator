@@ -3,6 +3,7 @@ import json
 import os
 import queue
 import threading
+from math import ceil
 
 
 def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFileNames=False):
@@ -67,9 +68,18 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
 
     # Hash Inputs
     class HashThread(threading.Thread):
-        def __init__(self, Input, ResultQueue):
+        def __init__(self, Input, InputSize, ResultQueue):
+            # Variables
+            self.ChunkSize = 65536
+            self.HashedBytes = 0
+            self.HashComplete = False
+
+            # Store Parameters
             self.Input = Input
+            self.InputSize = ceil(InputSize / self.ChunkSize)
             self.ResultQueue = ResultQueue
+
+            # Initialize
             super().__init__(daemon=True)
 
         def run(self):
@@ -96,8 +106,9 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
             # Hash Files in File Paths
             for File in [AbsoluteInputDirectory + "/" + RelativeFile for RelativeFile in FilePaths]:
                 with open(File, "rb") as OpenedFile:
-                    while OpenedFileChunk := OpenedFile.read(65536):
+                    while OpenedFileChunk := OpenedFile.read(self.ChunkSize):
                         HashObject.update(OpenedFileChunk)
+                        self.HashedBytes += self.ChunkSize
 
             # Hash File Paths
             if not IgnoreSingleFileNames:
@@ -106,11 +117,14 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
             # Put Hash Digest in Result Queue
             self.ResultQueue.put(HashObject.digest())
 
+            # Flag Hash Complete
+            self.HashComplete = True
+
     # Check Inputs in Threads
     ResultQueue = queue.Queue()
-    InputOneThread = HashThread(InputOne, ResultQueue)
+    InputOneThread = HashThread(InputOne, InputOneSize, ResultQueue)
     InputOneThread.start()
-    InputTwoThread = HashThread(InputTwo, ResultQueue)
+    InputTwoThread = HashThread(InputTwo, InputTwoSize, ResultQueue)
     InputTwoThread.start()
     InputOneThread.join()
     InputTwoThread.join()
