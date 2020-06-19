@@ -33,7 +33,7 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
         elif os.path.isdir(Input):
             CurrentTotal = 0
             for File in os.listdir(Input):
-                CurrentTotal += GetFileSize(File)
+                CurrentTotal += GetFileSize(Input + "/" + File)
             return CurrentTotal
         else:
             return None
