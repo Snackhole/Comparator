@@ -20,6 +20,28 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
         print("Must select different inputs to compare.")
         return None
 
+    def GetFileSize(Input):
+        if os.path.isfile(Input):
+            return os.path.getsize(Input)
+        elif os.path.isdir(Input):
+            CurrentTotal = 0
+            for File in os.listdir(Input):
+                CurrentTotal += GetFileSize(File)
+            return CurrentTotal
+        else:
+            return None
+
+    # Check File Sizes
+    InputOneSize = GetFileSize(InputOne)
+    InputTwoSize = GetFileSize(InputTwo)
+
+    if InputOneSize is None or InputTwoSize is None:
+        print("An error occurred determining file size.  Comparison not completed.")
+        return None
+
+    if InputOneSize != InputTwoSize:
+        return False
+
     # Determine Algorithm
     AvailableAlgorithms = sorted(list(hashlib.algorithms_available))
     DefaultAlgorithm = None
