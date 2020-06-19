@@ -20,6 +20,12 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
         print("Must select different inputs to compare.")
         return None
 
+    # Check for Identical File Names When Not Ignoring File Names
+    if os.path.isfile(InputOne) and os.path.isfile(InputTwo) and not IgnoreSingleFileNames:
+        if os.path.basename(InputOne) != os.path.basename(InputTwo):
+            return False
+
+    # Check File Sizes
     def GetFileSize(Input):
         if os.path.isfile(Input):
             return os.path.getsize(Input)
@@ -31,7 +37,6 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
         else:
             return None
 
-    # Check File Sizes
     InputOneSize = GetFileSize(InputOne)
     InputTwoSize = GetFileSize(InputTwo)
 
