@@ -110,19 +110,19 @@ class MainWindow(QMainWindow):
         self.Layout.addWidget(self.FileOneSelectButton, 1, 3)
         self.Layout.addWidget(self.FileTwoLineEdit, 2, 0, 1, 3)
         self.Layout.addWidget(self.FileTwoSelectButton, 2, 3)
+        self.Layout.addWidget(self.CompareHashesButton, 3, 0, 1, 4)
         self.ProgressLayout = QGridLayout()
         self.ProgressLayout.addWidget(self.FileOneProgressLabel, 0, 0)
         self.ProgressLayout.addWidget(self.FileOneProgressBar, 0, 1)
         self.ProgressLayout.addWidget(self.FileTwoProgressLabel, 0, 2)
         self.ProgressLayout.addWidget(self.FileTwoProgressBar, 0, 3)
-        self.Layout.addLayout(self.ProgressLayout, 3, 0, 1, 4)
-        self.Layout.addWidget(self.CompareHashesButton, 4, 0, 1, 4)
+        self.Layout.addLayout(self.ProgressLayout, 4, 0, 1, 4)
 
         # Set and Configure Layout
         self.Layout.setColumnStretch(0, 1)
         self.Layout.setColumnStretch(1, 1)
         self.Layout.setColumnStretch(2, 1)
-        self.Layout.setRowStretch(4, 1)
+        self.Layout.setRowStretch(3, 1)
         self.Frame.setLayout(self.Layout)
 
         # Create Status Bar
