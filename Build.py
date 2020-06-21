@@ -6,7 +6,7 @@ import shutil
 import zipapp
 
 BuildVariables = {}
-BuildVariables["Version"] = "1"
+BuildVariables["Version"] = "2"
 BuildVariables["AppName"] = "SerpentHash"
 BuildVariables["VersionedAppName"] = BuildVariables["AppName"] + " " + BuildVariables["Version"]
 
