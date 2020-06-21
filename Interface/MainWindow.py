@@ -1,6 +1,7 @@
 import hashlib
 import os
 import threading
+from math import floor
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
@@ -252,12 +253,10 @@ class MainWindow(QMainWindow):
             self.FileTwoProgressBar.reset()
 
     def UpdateProgress(self, HashThreadOne, HashThreadTwo):
-        if self.FileOneProgressBar.maximum() != HashThreadOne.InputSize:
-            self.FileOneProgressBar.setMaximum(HashThreadOne.InputSize)
-        if self.FileTwoProgressBar.maximum() != HashThreadTwo.InputSize:
-            self.FileTwoProgressBar.setMaximum(HashThreadTwo.InputSize)
-        self.FileOneProgressBar.setValue(HashThreadOne.HashedBytes)
-        self.FileTwoProgressBar.setValue(HashThreadTwo.HashedBytes)
+        HashThreadOneProgress = floor((HashThreadOne.HashedBytes / HashThreadOne.InputSize) * 100)
+        HashThreadTwoProgress = floor((HashThreadTwo.HashedBytes / HashThreadTwo.InputSize) * 100)
+        self.FileOneProgressBar.setValue(HashThreadOneProgress)
+        self.FileTwoProgressBar.setValue(HashThreadTwoProgress)
 
     # Window Management Methods
     def Center(self):
