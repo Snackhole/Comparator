@@ -6,3 +6,6 @@ venv/
 
 # VS Code
 .vscode/
+
+# SerpentHash Runtime Files and Compiled Versions
+Versions/
