@@ -2,9 +2,9 @@ import os
 import platform
 import shutil
 
-# Build Variables
 import zipapp
 
+# Build Variables
 BuildVariables = {}
 BuildVariables["Version"] = "2"
 BuildVariables["AppName"] = "SerpentHash"
