@@ -27,11 +27,11 @@ class MainWindow(QMainWindow):
         # Create Interface
         self.CreateInterface()
 
-        # Center Window
-        self.Center()
-
         # Show Window
         self.show()
+
+        # Center Window
+        self.Center()
 
     def CreateInterface(self):
         # Create Window Icon
