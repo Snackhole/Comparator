@@ -1,4 +1,5 @@
 import threading
+import time
 
 from PyQt5 import QtCore
 
@@ -16,5 +17,6 @@ class StatusThread(QtCore.QObject):
         self.Thread.start()
 
     def run(self):
-        while not self.HashThreadOne.HashComplete and not self.HashThreadTwo.HashComplete:
+        while not self.HashThreadOne.HashComplete or not self.HashThreadTwo.HashComplete:
             self.UpdateProgressSignal.emit()
+            time.sleep(0.25)
