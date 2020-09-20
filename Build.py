@@ -2,7 +2,6 @@ import os
 import platform
 import shutil
 import subprocess
-from subprocess import CompletedProcess
 
 import zipapp
 
