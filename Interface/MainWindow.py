@@ -19,7 +19,8 @@ class MainWindow(QMainWindow):
 
         # Variables
         self.ComparisonInProgress = False
-        self.LastSelectedFilePath = None
+        self.LastSelectedFilePathOne = None
+        self.LastSelectedFilePathTwo = None
 
         # Initialize
         super().__init__()
@@ -138,7 +139,8 @@ class MainWindow(QMainWindow):
     def ClearInput(self):
         self.FileOneLineEdit.clear()
         self.FileTwoLineEdit.clear()
-        self.LastSelectedFilePath = None
+        self.LastSelectedFilePathOne = None
+        self.LastSelectedFilePathTwo = None
 
     def PopulateAlgorithmList(self):
         AvailableAlgorithms = sorted(hashlib.algorithms_available)
@@ -154,8 +156,12 @@ class MainWindow(QMainWindow):
 
     def SelectFile(self, FileLineEdit):
         CurrentPath = ""
-        if self.LastSelectedFilePath is not None:
-            LastSelectedFilePathDirectory = os.path.dirname(self.LastSelectedFilePath)
+        if FileLineEdit is self.FileOneLineEdit:
+            LastSelectedFilePath = self.LastSelectedFilePathOne
+        elif FileLineEdit is self.FileTwoLineEdit:
+            LastSelectedFilePath = self.LastSelectedFilePathTwo
+        if LastSelectedFilePath is not None:
+            LastSelectedFilePathDirectory = os.path.dirname(LastSelectedFilePath)
             if os.path.exists(LastSelectedFilePathDirectory):
                 CurrentPath = LastSelectedFilePathDirectory
         if self.FolderModeRadioButton.isChecked():
@@ -164,7 +170,10 @@ class MainWindow(QMainWindow):
             Selected = QFileDialog.getOpenFileName(caption="Select File", directory=CurrentPath)[0]
         if Selected != "":
             FileLineEdit.setText(Selected)
-            self.LastSelectedFilePath = Selected
+            if FileLineEdit is self.FileOneLineEdit:
+                self.LastSelectedFilePathOne = Selected
+            elif FileLineEdit is self.FileTwoLineEdit:
+                self.LastSelectedFilePathTwo = Selected
 
     def CompareHashes(self):
         FileOne = self.FileOneLineEdit.text()
