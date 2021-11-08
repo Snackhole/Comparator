@@ -1,4 +1,5 @@
 import hashlib
+import json
 import os
 import threading
 from math import floor
@@ -12,6 +13,7 @@ from Interface.Threads.StatusThread import StatusThread
 
 
 class MainWindow(QMainWindow):
+    # Initialization Methods
     def __init__(self, ScriptName, AbsoluteDirectoryPath):
         # Store Parameters
         self.ScriptName = ScriptName
@@ -33,6 +35,9 @@ class MainWindow(QMainWindow):
 
         # Center Window
         self.Center()
+
+        # Load Configs
+        self.LoadConfigs()
 
     def CreateInterface(self):
         # Create Window Icon
@@ -133,9 +138,36 @@ class MainWindow(QMainWindow):
         # Set Central Frame
         self.setCentralWidget(self.Frame)
 
+    def LoadConfigs(self):
+        # Folder Mode
+        FolderModeFile = self.GetResourcePath("Configs/FolderMode.cfg")
+        if os.path.isfile(FolderModeFile):
+            with open(FolderModeFile, "r") as FolderModeConfigFile:
+                TargetRadioButton = self.FolderModeRadioButton if json.loads(FolderModeConfigFile.read()) else self.FileModeRadioButton
+                TargetRadioButton.setChecked(True)
+
+        # Ignore Names
+        IgnoreNamesFile = self.GetResourcePath("Configs/IgnoreNames.cfg")
+        if os.path.isfile(IgnoreNamesFile):
+            with open(IgnoreNamesFile, "r") as IgnoreNamesConfigFile:
+                self.IgnoreNamesInFileModeCheckBox.setChecked(json.loads(IgnoreNamesConfigFile.read()))
+
+    def SaveConfigs(self):
+        if not os.path.isdir(self.GetResourcePath("Configs")):
+            os.mkdir(self.GetResourcePath("Configs"))
+
+        # Folder Mode
+        with open(self.GetResourcePath("Configs/FolderMode.cfg"), "w") as FolderModeConfigFile:
+            FolderModeConfigFile.write(json.dumps(self.FolderModeRadioButton.isChecked()))
+
+        # Ignore Names
+        with open(self.GetResourcePath("Configs/IgnoreNames.cfg"), "w") as IgnoreNamesConfigFile:
+            IgnoreNamesConfigFile.write(json.dumps(self.IgnoreNamesInFileModeCheckBox.isChecked()))
+
     def GetResourcePath(self, RelativeLocation):
         return self.AbsoluteDirectoryPath + "/" + RelativeLocation
 
+    # Input Methods
     def ClearInput(self):
         self.FileOneLineEdit.clear()
         self.FileTwoLineEdit.clear()
@@ -175,6 +207,7 @@ class MainWindow(QMainWindow):
             elif FileLineEdit is self.FileTwoLineEdit:
                 self.LastSelectedFilePathTwo = Selected
 
+    # Hashing Methods
     def CompareHashes(self):
         FileOne = self.FileOneLineEdit.text()
         FileTwo = self.FileTwoLineEdit.text()
@@ -231,13 +264,16 @@ class MainWindow(QMainWindow):
         else:
             self.DisplayMessageBox("Files are not identical!", Icon=QMessageBox.Warning)
 
+    # Close Event
     def closeEvent(self, event):
         if self.ComparisonInProgress:
             if self.DisplayMessageBox("A comparison is in progress.  Exit anyway?", Icon=QMessageBox.Question, Buttons=(QMessageBox.Yes | QMessageBox.No)) == QMessageBox.Yes:
+                self.SaveConfigs()
                 event.accept()
             else:
                 event.ignore()
         else:
+            self.SaveConfigs()
             event.accept()
 
     # Interface Methods
