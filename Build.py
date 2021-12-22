@@ -8,7 +8,7 @@ import zipapp
 # Build Variables
 BuildVariables = {}
 BuildVariables["Version"] = "5"
-BuildVariables["AppName"] = "SerpentHash"
+BuildVariables["AppName"] = "Comparator"
 BuildVariables["VersionedAppName"] = BuildVariables["AppName"] + " " + BuildVariables["Version"]
 
 
@@ -31,7 +31,7 @@ def Build():
         print("OS unsupported; you'll have to write your own build function to package on this OS.")
         return
 
-    BuildVariables["CodeFiles"] = ["Core", "Interface", "Build.py", "SerpentHash.py"]
+    BuildVariables["CodeFiles"] = ["Core", "Interface", "Build.py", "Comparator.py"]
     BuildVariables["AssetFiles"] = ["Assets"]
 
     BuildVariables["ExecutableZipName"] = BuildVariables["AppName"] + ".pyzw"

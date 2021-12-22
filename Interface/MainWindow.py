@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
 
     def CreateInterface(self):
         # Create Window Icon
-        self.WindowIcon = QIcon(self.GetResourcePath("Assets/SerpentHash Icon.png"))
+        self.WindowIcon = QIcon(self.GetResourcePath("Assets/Comparator Icon.png"))
 
         # Window Icon and Title
         self.setWindowIcon(self.WindowIcon)

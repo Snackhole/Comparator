@@ -1,10 +1,10 @@
 import os
 
-AppName = "SerpentHash"
+AppName = "Comparator"
 ExecutableZip = AppName + ".pyzw"
 CurrentWorkingDirectory = os.getcwd()
 AbsolutePathToExecutableZip = CurrentWorkingDirectory + "/" + ExecutableZip
-AbsolutePathToIconPNG = CurrentWorkingDirectory + "/Assets/SerpentHash Icon.png"
+AbsolutePathToIconPNG = CurrentWorkingDirectory + "/Assets/Comparator Icon.png"
 
 DesktopFileContents = """[Desktop Entry]
 Type=Application
