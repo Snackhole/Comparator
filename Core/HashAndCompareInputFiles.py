@@ -83,20 +83,19 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
             super().__init__(name=Name, daemon=True)
 
         def run(self):
-            AbsoluteInputPath = os.path.abspath(self.Input)
-            AbsoluteInputDirectory = os.path.dirname(AbsoluteInputPath)
-            RelativeInputPath = os.path.basename(AbsoluteInputPath)
+            InputDirectory = os.path.dirname(self.Input)
+            RelativeInputPath = os.path.basename(self.Input)
             FilePaths = []
 
-            def MapFilePaths(AbsoluteInputDirectory, RelativeInputPath, FilePaths):
-                CurrentFile = AbsoluteInputDirectory + "/" + RelativeInputPath
+            def MapFilePaths(InputDirectory, RelativeInputPath, FilePaths):
+                CurrentFile = os.path.join(InputDirectory, RelativeInputPath)
                 if os.path.isfile(CurrentFile):
                     FilePaths.append(RelativeInputPath)
                 elif os.path.isdir(CurrentFile):
                     for File in os.listdir(CurrentFile):
-                        MapFilePaths(AbsoluteInputDirectory, RelativeInputPath + "/" + File, FilePaths)
+                        MapFilePaths(InputDirectory, os.path.join(RelativeInputPath, File), FilePaths)
 
-            MapFilePaths(AbsoluteInputDirectory, RelativeInputPath, FilePaths)
+            MapFilePaths(InputDirectory, RelativeInputPath, FilePaths)
 
             FilePaths.sort()
 
@@ -104,7 +103,7 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
             HashObject = hashlib.new(Algorithm)
 
             # Hash Files in File Paths
-            for File in [AbsoluteInputDirectory + "/" + RelativeFile for RelativeFile in FilePaths]:
+            for File in [os.path.join(InputDirectory, RelativeFile) for RelativeFile in FilePaths]:
                 with open(File, "rb") as OpenedFile:
                     while OpenedFileChunk := OpenedFile.read(self.ChunkSize):
                         HashObject.update(OpenedFileChunk)
