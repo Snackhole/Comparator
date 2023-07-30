@@ -56,7 +56,8 @@ def Build():
     # Linux-Specific Build Variables
     if BuildVariables["OS"] == "Linux":
         BuildVariables["Command"] = "pip3 install -r \"" + BuildVariables["CurrentWorkingDirectory"] + "/requirements.txt\" --target \"" + BuildVariables["CurrentWorkingDirectory"] + "/" + BuildVariables["BuildFolder"] + "\""
-        BuildVariables["AssetFiles"].append("CreateLinuxDesktopFile.py", "CreateLinuxDesktopFileForIncludedInterpreter.py")
+        BuildVariables["AssetFiles"].append("CreateLinuxDesktopFile.py")
+        BuildVariables["AssetFiles"].append("CreateLinuxDesktopFileForIncludedInterpreter.py")
         BuildVariables["ArchivedFiles"].append("Python Interpreter - Linux.zip")
 
     # Copy Code to Build Folder
