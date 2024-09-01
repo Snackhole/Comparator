@@ -298,6 +298,8 @@ class MainWindow(QMainWindow):
             self.FileTwoProgressBar.reset()
 
     def UpdateProgress(self, HashThreadOne, HashThreadTwo):
+        if HashThreadOne.InputSize <= 0 or HashThreadTwo.InputSize <= 0:
+            return
         HashThreadOneProgress = floor((HashThreadOne.HashedBytes / HashThreadOne.InputSize) * 100)
         HashThreadTwoProgress = floor((HashThreadTwo.HashedBytes / HashThreadTwo.InputSize) * 100)
         self.FileOneProgressBar.setValue(HashThreadOneProgress)
