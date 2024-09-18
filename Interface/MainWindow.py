@@ -165,7 +165,7 @@ class MainWindow(QMainWindow):
             IgnoreNamesConfigFile.write(json.dumps(self.IgnoreNamesInFileModeCheckBox.isChecked()))
 
     def GetResourcePath(self, RelativeLocation):
-        return self.AbsoluteDirectoryPath + "/" + RelativeLocation
+        return os.path.join(self.AbsoluteDirectoryPath, RelativeLocation)
 
     # Input Methods
     def ClearInput(self):

@@ -33,7 +33,7 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
         elif os.path.isdir(Input):
             CurrentTotal = 0
             for File in os.listdir(Input):
-                CurrentTotal += GetFileSize(Input + "/" + File)
+                CurrentTotal += GetFileSize(os.path.join(Input, File))
             return CurrentTotal
         else:
             return None
@@ -60,10 +60,10 @@ def HashAndCompareInputFiles(InputOne, InputTwo, Algorithm=None, IgnoreSingleFil
         if DefaultAlgorithm is not None:
             Algorithm = DefaultAlgorithm
         else:
-            print("No default algorithm is present.  Available algorithms:\n\n" + str(AvailableAlgorithms))
+            print(f"No default algorithm is present.  Available algorithms:\n\n{str(AvailableAlgorithms)}")
             return None
     if Algorithm not in AvailableAlgorithms:
-        print("Algorithm not available.  Available algorithms:\n\n" + str(AvailableAlgorithms))
+        print(f"Algorithm not available.  Available algorithms:\n\n{str(AvailableAlgorithms)}")
         return None
 
     # Hash Inputs
