@@ -4,9 +4,9 @@ import os
 import threading
 from math import floor
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox, QFileDialog, QCheckBox, QProgressBar, QLabel
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import QMainWindow, QMessageBox, QApplication, QGridLayout, QFrame, QLineEdit, QPushButton, QSizePolicy, QRadioButton, QComboBox, QFileDialog, QCheckBox, QProgressBar, QLabel
 
 from Interface.Threads.ComparisonThread import ComparisonThread
 from Interface.Threads.StatusThread import StatusThread
@@ -48,7 +48,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.ScriptName)
 
         # Button and Line Edit Size Policy
-        self.ButtonAndLineEditSizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.ButtonAndLineEditSizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
 
         # Create Central Frame
         self.Frame = QFrame()
@@ -109,7 +109,7 @@ class MainWindow(QMainWindow):
         self.Layout = QGridLayout()
 
         # Widgets in Layout
-        self.Layout.addWidget(self.FolderModeRadioButton, 0, 0, Qt.AlignRight)
+        self.Layout.addWidget(self.FolderModeRadioButton, 0, 0, Qt.AlignmentFlag.AlignRight)
         self.Layout.addWidget(self.FileModeRadioButton, 0, 1)
         self.Layout.addWidget(self.IgnoreNamesInFileModeCheckBox, 0, 2)
         self.Layout.addWidget(self.AlgorithmComboBox, 0, 3)
@@ -217,7 +217,7 @@ class MainWindow(QMainWindow):
             self.DisplayMessageBox("Two files must be selected to compare.")
             return
         if not (os.path.exists(FileOne) and os.path.exists(FileTwo)):
-            self.DisplayMessageBox("At least one file does not exist.", Icon=QMessageBox.Warning)
+            self.DisplayMessageBox("At least one file does not exist.", Icon=QMessageBox.Icon.Warning)
             return
         if FileOne == FileTwo:
             self.DisplayMessageBox("Must select different files to compare.")
@@ -258,16 +258,16 @@ class MainWindow(QMainWindow):
 
         # Display Result
         if FilesIdentical is None:
-            self.DisplayMessageBox("An error occurred.  Files were not compared.", Icon=QMessageBox.Warning)
+            self.DisplayMessageBox("An error occurred.  Files were not compared.", Icon=QMessageBox.Icon.Warning)
         elif FilesIdentical:
             self.DisplayMessageBox("Files are identical!")
         else:
-            self.DisplayMessageBox("Files are not identical!", Icon=QMessageBox.Warning)
+            self.DisplayMessageBox("Files are not identical!", Icon=QMessageBox.Icon.Warning)
 
     # Close Event
     def closeEvent(self, event):
         if self.ComparisonInProgress:
-            if self.DisplayMessageBox("A comparison is in progress.  Exit anyway?", Icon=QMessageBox.Question, Buttons=(QMessageBox.Yes | QMessageBox.No)) == QMessageBox.Yes:
+            if self.DisplayMessageBox("A comparison is in progress.  Exit anyway?", Icon=QMessageBox.Icon.Question, Buttons=(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)) == QMessageBox.StandardButton.Yes:
                 self.SaveConfigs()
                 event.accept()
             else:
@@ -277,14 +277,14 @@ class MainWindow(QMainWindow):
             event.accept()
 
     # Interface Methods
-    def DisplayMessageBox(self, Message, Icon=QMessageBox.Information, Buttons=QMessageBox.Ok, Parent=None):
+    def DisplayMessageBox(self, Message, Icon=QMessageBox.Icon.Information, Buttons=QMessageBox.StandardButton.Ok, Parent=None):
         MessageBox = QMessageBox(self if Parent is None else Parent)
         MessageBox.setWindowIcon(self.WindowIcon)
         MessageBox.setWindowTitle(self.ScriptName)
         MessageBox.setIcon(Icon)
         MessageBox.setText(Message)
         MessageBox.setStandardButtons(Buttons)
-        return MessageBox.exec_()
+        return MessageBox.exec()
 
     def SetComparisonInProgress(self, ComparisonInProgress):
         self.ComparisonInProgress = ComparisonInProgress
